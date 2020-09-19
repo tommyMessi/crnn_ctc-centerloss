@@ -1,0 +1,17 @@
+name: raw
+epochs: 10
+batch_size: 256
+
+lr: 0.001
+lr_decay_epochs:
+  - 3
+  - 6
+lr_decay_rate: 0.5
+
+# adadelate, adam, rms
+optimizer: adadelate
+
+use_lstm: false
+num_lstm_layer: 2
+rnn_keep_prob: 1.0
+rnn_num_units: 256

@@ -1,0 +1,16 @@
+name: dense
+epochs: 10000000
+batch_size: 16
+
+lr: 0.0001
+lr_decay_epochs:
+  - 200000
+lr_decay_rate: 0.1
+
+# adadelate, adam, rms
+optimizer: adam
+
+use_lstm: true
+num_lstm_layer: 2
+rnn_keep_prob: 0.8
+rnn_num_units: 256

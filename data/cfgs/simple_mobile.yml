@@ -1,0 +1,17 @@
+name: simple
+epochs: 9
+batch_size: 256
+
+lr: 1
+lr_decay_epochs:
+  - 3
+  - 6
+lr_decay_rate: 0.9
+
+# adadelate, adam, rms
+optimizer: adadelate
+
+use_lstm: true
+num_lstm_layer: 1
+rnn_keep_prob: 0.8
+rnn_num_units: 128

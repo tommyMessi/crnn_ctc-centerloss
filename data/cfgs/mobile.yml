@@ -1,0 +1,18 @@
+name: mobile
+epochs: 15
+batch_size: 32
+
+lr: 1.0
+lr_decay_epochs:
+  - 2
+  - 3
+  - 6
+lr_decay_rate: 0.8
+
+# adadelate, adam, rms
+optimizer: adadelate
+
+use_lstm: true
+num_lstm_layer: 1
+rnn_keep_prob: 0.8
+rnn_num_units: 256
