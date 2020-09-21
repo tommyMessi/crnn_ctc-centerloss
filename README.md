@@ -23,10 +23,6 @@
 ```python test.py```
 
 ## 效果
-### 测试图片为./data_example/test_data/xingjin
-
-['成一一威，风一一凤，干一一千，土一一士，元一一无，他一一地', '素一一索，朱一一末，都一一郡，汨一一汩，李一一季，直一一真，', '阴一一阻，史一一更，思一一恩，孟一一盂', '侯一一候，竞一一竟，宵一一霄，毫一一毫', '令：怜，伶，邻， 冷，领，龄，铃，岭，玲，拎', '逢：缝，蓬，篷，峰，锋，逢，蜂', '1 79.00 30.02 30.02', 'A1200622287g4811330009']
-
 - ![1](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/gg1.jpg)
 - 'A1200622287g4811330009'
 - ![2](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/gg2.jpg)
@@ -35,6 +31,10 @@
 - '令：怜，伶，邻， 冷，领，龄，铃，岭，玲，拎'
 - ![4](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/ling2.png)
 - '逢：缝，蓬，篷，峰，锋，逢，蜂'
+- ![5](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/xj10.png)
+- '成一一威，风一一凤，干一一千，土一一士，元一一无，他一一地'
+- ![6](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/xj7.png)
+- '素一一索，朱一一末，都一一郡，汨一一汩，李一一季，直一一真，'
 
 ## 其他
 训练数据与预训练模型 关注微信公众账号 hulugeAI 留言：ctc 获取 线下wx交流群入门券
