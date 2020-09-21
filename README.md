@@ -33,6 +33,8 @@
 - '1 79.00 30.02 30.02'
 - ![3](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/ling.png)
 - '令：怜，伶，邻， 冷，领，龄，铃，岭，玲，拎'
+- ![4](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/ling2.png)
+- '逢：缝，蓬，篷，峰，锋，逢，蜂'
 
 ## 其他
 训练数据与预训练模型 关注微信公众账号 hulugeAI 留言：ctc 获取 线下wx交流群入门券
