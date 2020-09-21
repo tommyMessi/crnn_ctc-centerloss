@@ -34,7 +34,7 @@
 - ![5](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/xj10.png)
 - '成一一威，风一一凤，干一一千，土一一士，元一一无，他一一地'
 - ![6](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data_example/test_data/xingjin/xj7.png)
-- '素一一索，朱一一末，都一一郡，汨一一汩，李一一季，直一一真，'
+- '素一一索，朱一一宋，都一一郡，汨一一汩，李一一季，直一一真，'
 
 ## 其他
 训练数据与预训练模型 关注微信公众账号 hulugeAI 留言：ctc 获取 线下wx交流群入门券
