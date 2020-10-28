@@ -9,7 +9,7 @@
 ```pip install -r requirements.txt```
 
 ## 预训练模型(Model)
-- 链接: https://pan.baidu.com/s/1H8YyRVN9keOQuQ-v3nwArg 提取码: vs3g
+- 链接: 链接：https://pan.baidu.com/s/12oa1QcjaWiLb7Xsiz7aqbg  提取码：6Dw9 
 
 ## 训练(train)
 - 1 先用https://github.com/Sanster/tf_crnn 的crnn训练
