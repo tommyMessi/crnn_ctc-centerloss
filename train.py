@@ -9,7 +9,7 @@ import numpy as np
 
 np.random.seed(RNG_SEED)
 import tensorflow as tf
-import cv2
+
 tf.set_random_seed(RNG_SEED)
 
 import libs.utils as utils
@@ -19,6 +19,7 @@ from libs.label_converter import LabelConverter
 import libs.infer as infer
 
 from nets.crnn import CRNN
+from parse_args import parse_args
 from _pydecimal import Decimal, Context, ROUND_HALF_UP
 
 class Trainer(object):
@@ -54,10 +55,9 @@ class Trainer(object):
         epoch_start_index = 0
         batch_start_index = 0
 
-
         config=tf.ConfigProto(allow_soft_placement=True)
         config.gpu_options.allow_growth = True
-        config.gpu_options.per_process_gpu_memory_fraction = 1
+        config.gpu_options.per_process_gpu_memory_fraction = 0.8
         sess = tf.Session(config=config)
         sess.run(tf.global_variables_initializer())
 
@@ -103,7 +103,7 @@ class Trainer(object):
         print("Restored batch_start_index: %d" % batch_start_index)
 
     def round_up(self, n):
-        print(n * 10 % 10)
+        #print(n * 10 % 10)
         k = n * 10 % 10
         if k < 5:
             return int(n)
@@ -112,10 +112,9 @@ class Trainer(object):
 
     def _train(self, model, tr_ds, sess):
         img_batch, label_batch, labels, positions, _ = tr_ds.get_next_batch(sess)
-
         image_batch_shape = img_batch.shape
         w = self.round_up(image_batch_shape[2]/4)
-        print(w)
+        #print(w)
         positions_list = []
         for position_str in positions:
             list2 = [6940 for i in range(w)]
@@ -127,9 +126,15 @@ class Trainer(object):
         con_labels_batch = np.array(positions_list)
         con_labels_batch = con_labels_batch.reshape((-1))
 
-
+        #print('image_batch:', img_batch.shape)
+        #print('con_labels_batch:', con_labels_batch)
+        print('label_batch[1]:', label_batch[1].shape)
+        #print('label_batch[2]:', label_batch)
+        #print('labels',labels)
+        #print('labels[0]',len(labels[0]))
         feed = {model.inputs: img_batch,
                 model.labels: label_batch,
+                model.bat_labels:label_batch[1],
                 model.con_labels: con_labels_batch,
                 model.len_labels: w,
                 model.is_training: True}
@@ -140,11 +145,29 @@ class Trainer(object):
                    model.regularization_loss,
                    model.global_step,
                    model.lr,
-                   model.train_op]
+                   model.train_op,
+                   model.decoded,
+                   model.logits,
+                   model.ind_array,
+                   model.center_ind_array,
+                   model.center_input_tensor,
+                   model.bat_labels,
+                   model.con_labels]
 
-        batch_cost, ctc_loss ,centers_update_op, _, global_step, lr, _ = sess.run(fetches, feed)
-        print('center_loss',centers_update_op.shape)
-        print('ctc_loss', ctc_loss)
+        batch_cost, ctc_loss ,centers_update_op, _, global_step, lr, _, decoded, logits, ind_array, center_ind_array, center_input_tensor, mbat_labels, mcon_labels = sess.run(fetches, feed)
+        #print('center_loss',centers_update_op.shape)
+        #print('ctc_loss', ctc_loss)
+        #print('decoded[0]:',decoded[0][0])
+        #print('decoded[1]:',decoded[0][1])
+        #print('decoded[2]:',decoded[0][2])
+        #print('logits:', logits)
+        #print('logits_max:', np.argmax(logits, axis=2))
+        #print('ind_array:', ind_array)
+        print('mbat_labels.shape:',mbat_labels.shape)
+        print('center_input_tensor.shape:', center_input_tensor.shape)
+        print('outputs_center:',centers_update_op.shape)
+        print('con_labels:',mcon_labels.shape)
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         return batch_cost, global_step, lr
 
     def _train_with_summary(self, model, tr_ds, sess, train_writer,converter):
@@ -170,7 +193,6 @@ class Trainer(object):
                 model.is_training: True}
 
         fetches = [model.total_loss,
-                   model.centers_update_op,
                    model.ctc_loss,
                    model.regularization_loss,
                    model.global_step,
@@ -180,9 +202,10 @@ class Trainer(object):
                    model.edit_distance,
                    model.train_op]
 
-        batch_cost, centers_update_op,_, _, global_step, lr, summary, predicts, edit_distance, _ = sess.run(fetches, feed)
+        batch_cost,_, _, global_step, lr, summary, predicts, edit_distance, _ = sess.run(fetches, feed)
         train_writer.add_summary(summary, global_step)
 
+        print(batch_cost)
         predicts = [converter.decode(p, CRNN.CTC_INVALID_INDEX) for p in predicts]
         accuracy, _ = infer.calculate_accuracy(predicts, labels)
 
@@ -239,13 +262,15 @@ class Trainer(object):
 
 
 def main():
-    dev = '/gpu:0'
+    dev = '/gpu:2'
+    # args = parse_args()
     with tf.device(dev):
         trainer = Trainer()
-        trainer.train(log_dir='./output_20200918/log', restore=False, log_step=50, val_step=50, cfg_name='raw', ckpt_dir='./output_20200918/checkpoint/default',
+        trainer.train(log_dir='./output_20200918/log', restore=False, log_step=50, val_step=50, cfg_name='raw',
+                      ckpt_dir='./output_20200918/checkpoint/default',
                       chars_file='./data/chars/lexicon.txt', train_txt='./data_example/train_new.txt',
                       val_txt='./data_example//test_new.txt', test_txt='./data_example//test_new.txt',
-                      result_dir='./output_20200918/result')
+                      result_dir='./output_20200918/result'
 
 
 if __name__ == '__main__':

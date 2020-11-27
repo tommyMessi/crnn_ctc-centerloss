@@ -22,6 +22,7 @@ class CRNN(object):
         self.cfg = cfg
         # SparseTensor required by ctc_loss op
         self.labels = tf.sparse_placeholder(tf.int32, name="labels")
+        self.bat_labels = tf.placeholder(tf.int32, name="bat_labels")
         self.con_labels = tf.placeholder(tf.int32, name="con_labels")
         self.len_labels = tf.placeholder(tf.int32, name="len_labels")
         # 1d array of size [batch_size]
@@ -82,8 +83,7 @@ class CRNN(object):
         else:
             logits = slim.fully_connected(cnn_out_reshaped, self.num_classes, activation_fn=None)
 
-        # ctc require time major
-        # batch, imgw, 256
+
         self.prelogits = tf.reshape(logits, [-1, self.num_classes])
         self.logits = tf.transpose(logits, (1, 0, 2))
         self.outputs_center = tf.reshape(self.logits[:, :self.len_labels, :], [-1, self.num_classes])
@@ -91,11 +91,7 @@ class CRNN(object):
     def _build_train_op(self):
         self.global_step = tf.Variable(0, trainable=False)
 
-        # labels:   An `int32` `SparseTensor`.
-        #           `labels.indices[i, :] == [b, t]` means `labels.values[i]` stores
-        #           the id for (batch b, time t).
-        #           `labels.values[i]` must take on values in `[0, num_labels)`.
-        # inputs shape: [max_time, batch_size, num_classes]`
+
         self.ctc_loss = tf.nn.ctc_loss(labels=self.labels,
                                        inputs=self.logits,
                                        ignore_longer_outputs_than_inputs=True,
@@ -105,11 +101,20 @@ class CRNN(object):
         self.regularization_loss = tf.constant(0.0)
         # self.regularization_loss = tf.add_n(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
 
+        max_array =  tf.argmax(self.logits, axis=2)
 
-        self.center_loss, centers, self.centers_update_op = self.get_center_loss(self.outputs_center, self.con_labels, 0.5, 6941)
+        self.ind_array = tf.where(condition=max_array<6940)
 
+        center_max_array = tf.argmax(self.outputs_center, axis=1)
+        self.center_ind_array = tf.where(condition=center_max_array<6940)
 
-        self.total_loss = self.ctc_loss + self.center_loss*0.00001
+        self.center_input_tensor = tf.gather(self.outputs_center, self.center_ind_array, axis=0)
+        self.center_input_tensor = tf.squeeze(self.center_input_tensor)
+
+        self.center_loss, centers, self.centers_update_op = self.get_center_loss(self.center_input_tensor, self.bat_labels, 0.5, 6941)
+
+        self.total_loss = self.ctc_loss + self.center_loss*0.000001
+
 
         tf.summary.scalar('ctc_loss', self.ctc_loss)
         tf.summary.scalar('regularization_loss', self.regularization_loss)
@@ -133,17 +138,17 @@ class CRNN(object):
             self.optimizer = tf.train.MomentumOptimizer(learning_rate=self.lr,
                                                         momentum=0.9)
 
-        # required by batch normalize
-        # add update ops(for moving_mean and moving_variance) as a dependency to the train_op
-        # https://www.tensorflow.org/api_docs/python/tf/layers/batch_normalization
+
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         # update_ops.append(centers_update_op)
         with tf.control_dependencies(update_ops):
             self.train_op = self.optimizer.minimize(self.total_loss, global_step=self.global_step)
 
         # inputs shape: [max_time x batch_size x num_classes]
+
         self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(self.logits, self.seq_len, merge_repeated=True)
 
+        print('decoded',self.decoded)
         # dense_decoded shape: [batch_size, encoded_code_size(not fix)]
         # use tf.cast here to support run model on Android
         self.dense_decoded = tf.sparse_tensor_to_dense(tf.cast(self.decoded[0], tf.int32),
@@ -202,8 +207,7 @@ class CRNN(object):
             self.dense_decoded,
             self.edit_distance,
             self.edit_distances,
-            self.logits,
-            self.decoded
+
         ]
 
 
@@ -232,10 +236,16 @@ class CRNN(object):
             centers_update_op: op,用于更新样本中心的op，在训练时需要同时运行该op，否则样本中心不会更新
         """
         # 获取特征的维数，例如256维
+        print('~~~~~~~~~~~~~~~~~~~~~~~~',labels.get_shape())
+        print('~~~~~~~~~~~~~~~~~~~~~~~~',features.get_shape())
         len_features = features.get_shape()[1]
+        if features.get_shape()[0] != labels.get_shape()[0]:
+            return 0, 0, 0
+
         # 建立一个Variable,shape为[num_classes, len_features]，用于存储整个网络的样本中心，
         # 设置trainable=False是因为样本中心不是由梯度进行更新的
-        centers = tf.get_variable('centers', [num_classes, len_features], dtype=tf.float32,
+        print('~~~~~~~~~~~~~~~~~~~~~~~',num_classes, len_features)
+        centers = tf.get_variable('centers', [num_classes, 6941], dtype=tf.float32,
                                   initializer=tf.constant_initializer(0), trainable=False)
         # 将label展开为一维的，输入如果已经是一维的，则该动作其实无必要
         labels = tf.reshape(labels, [-1])
@@ -243,6 +253,8 @@ class CRNN(object):
 
         # 构建label
 
+        if tf.shape(centers) != tf.shape(labels):
+            return 0,0,0
         # 根据样本label,获取mini-batch中每一个样本对应的中心值
         centers_batch = tf.gather(centers, labels)
         # 计算loss
