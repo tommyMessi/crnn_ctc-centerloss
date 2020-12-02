@@ -140,7 +140,8 @@ class CRNN(object):
 
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-        # update_ops.append(centers_update_op)
+        if self.centers_update_op!=0:
+            update_ops.append(self.centers_update_op)
         with tf.control_dependencies(update_ops):
             self.train_op = self.optimizer.minimize(self.total_loss, global_step=self.global_step)
 
@@ -239,8 +240,6 @@ class CRNN(object):
         print('~~~~~~~~~~~~~~~~~~~~~~~~',labels.get_shape())
         print('~~~~~~~~~~~~~~~~~~~~~~~~',features.get_shape())
         len_features = features.get_shape()[1]
-        if features.get_shape()[0] != labels.get_shape()[0]:
-            return 0, 0, 0
 
         # 建立一个Variable,shape为[num_classes, len_features]，用于存储整个网络的样本中心，
         # 设置trainable=False是因为样本中心不是由梯度进行更新的
