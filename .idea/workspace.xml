@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6a6fc68c-aca6-480b-801b-08d142d6ccb4" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/ctc_centerloss.iml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -245,7 +240,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609074328865</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="modify readme">
+      <created>1609074710560</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1609074710560</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -302,9 +304,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="solve align problem; add visualization" />
-    <MESSAGE value="modify readme" />
     <MESSAGE value="Revert &quot;modify readme&quot;&#10;&#10;This reverts commit 7313386" />
-    <option name="LAST_COMMIT_MESSAGE" value="Revert &quot;modify readme&quot;&#10;&#10;This reverts commit 7313386" />
+    <MESSAGE value="modify readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="modify readme" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
