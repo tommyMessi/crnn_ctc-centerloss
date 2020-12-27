@@ -61,11 +61,14 @@ class Trainer(object):
         sess = tf.Session(config=config)
         sess.run(tf.global_variables_initializer())
 
-        saver = tf.train.Saver(tf.global_variables(), max_to_keep=8)
+        res_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES)
+        res_vars = [v for v in res_vars if v.name.find('centers') == -1]
+        saver = tf.train.Saver(res_vars, max_to_keep=8)
+
         train_writer = tf.summary.FileWriter(log_dir, sess.graph)
 
         if restore:
-            self._restore(sess, saver, model,tr_ds, ckpt_dir)
+            self._restore(sess, saver, model, tr_ds, ckpt_dir)
 
         print('Begin training...')
         for epoch in range(epoch_start_index, cfg.epochs):
@@ -111,50 +114,38 @@ class Trainer(object):
             return int(n) + 1
 
     def _train(self, model, tr_ds, sess):
-        img_batch, label_batch, labels, positions, _ = tr_ds.get_next_batch(sess)
+        img_batch, label_batch, labels, *rest = tr_ds.get_next_batch(sess)
         image_batch_shape = img_batch.shape
         w = self.round_up(image_batch_shape[2]/4)
-        #print(w)
-        positions_list = []
-        for position_str in positions:
-            list2 = [6940 for i in range(w)]
-            position_list = str(position_str, encoding = "utf8").split(',')
-            num_list_new = [int(x) for x in position_list]
-            list2[:len(num_list_new)] = num_list_new
+        # print(w)
+        char_num = [len(l) for l in labels]
+        pos_init = [[-1, -1]]
 
-            positions_list.append(list2)
-        con_labels_batch = np.array(positions_list)
-        con_labels_batch = con_labels_batch.reshape((-1))
-
-        #print('image_batch:', img_batch.shape)
-        #print('con_labels_batch:', con_labels_batch)
         print('label_batch[1]:', label_batch[1].shape)
         #print('label_batch[2]:', label_batch)
         #print('labels',labels)
         #print('labels[0]',len(labels[0]))
         feed = {model.inputs: img_batch,
                 model.labels: label_batch,
-                model.bat_labels:label_batch[1],
-                model.con_labels: con_labels_batch,
+                model.bat_labels: label_batch[1],
                 model.len_labels: w,
+                model.char_num: char_num,
+                model.char_pos_init: pos_init,
                 model.is_training: True}
 
         fetches = [model.total_loss,
                    model.ctc_loss,
-                   model.outputs_center,
+                   model.centers_update_op,
                    model.regularization_loss,
                    model.global_step,
                    model.lr,
                    model.train_op,
                    model.decoded,
-                   model.logits,
-                   model.ind_array,
-                   model.center_ind_array,
-                   model.center_input_tensor,
-                   model.bat_labels,
-                   model.con_labels]
+                   model.logits
+                   ]
 
-        batch_cost, ctc_loss ,centers_update_op, _, global_step, lr, _, decoded, logits, ind_array, center_ind_array, center_input_tensor, mbat_labels, mcon_labels = sess.run(fetches, feed)
+        batch_cost, ctc_loss ,centers_update_op, _, global_step, lr, _, decoded, logits = sess.run(fetches, feed)
+
         #print('center_loss',centers_update_op.shape)
         #print('ctc_loss', ctc_loss)
         #print('decoded[0]:',decoded[0][0])
@@ -163,33 +154,27 @@ class Trainer(object):
         #print('logits:', logits)
         #print('logits_max:', np.argmax(logits, axis=2))
         #print('ind_array:', ind_array)
-        print('mbat_labels.shape:',mbat_labels.shape)
-        print('center_input_tensor.shape:', center_input_tensor.shape)
-        print('outputs_center:',centers_update_op.shape)
-        print('con_labels:',mcon_labels.shape)
+        # print('mbat_labels.shape:',mbat_labels.shape)
+        # print('center_input_tensor.shape:', center_input_tensor.shape)
+        # print('outputs_center:',centers_update_op.shape)
+        # print('con_labels:',mcon_labels.shape)
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         return batch_cost, global_step, lr
 
-    def _train_with_summary(self, model, tr_ds, sess, train_writer,converter):
-        img_batch, label_batch, labels, positions, _ = tr_ds.get_next_batch(sess)
+    def _train_with_summary(self, model, tr_ds, sess, train_writer, converter):
+        img_batch, label_batch, labels, *rest = tr_ds.get_next_batch(sess)
         image_batch_shape = img_batch.shape
         w = self.round_up(image_batch_shape[2]/4)
-        positions_list = []
-        for position_str in positions:
-            list2 = [6940 for i in range(w)]
-            position_list = str(position_str, encoding = "utf8").split(',')
-            num_list_new = [int(x) for x in position_list]
-            list2[:len(num_list_new)] = num_list_new
-
-            positions_list.append(list2)
-        con_labels_batch = np.array(positions_list)
-        con_labels_batch = con_labels_batch.reshape((-1))
+        char_num = [len(l) for l in labels]
+        pos_init = [[-1, -1]]
 
         # print('image_batch:',img_batch)
         feed = {model.inputs: img_batch,
                 model.labels: label_batch,
-                model.con_labels: con_labels_batch,
+                model.bat_labels: label_batch[1],
                 model.len_labels: w,
+                model.char_num: char_num,
+                model.char_pos_init: pos_init,
                 model.is_training: True}
 
         fetches = [model.total_loss,
@@ -197,13 +182,21 @@ class Trainer(object):
                    model.regularization_loss,
                    model.global_step,
                    model.lr,
-                   model.merged_summay,
+                   model.merged_summary,
                    model.dense_decoded,
                    model.edit_distance,
-                   model.train_op]
+                   model.train_op,
+                   model.min_k,
+                   model.max_k
+        ]
 
-        batch_cost,_, _, global_step, lr, summary, predicts, edit_distance, _ = sess.run(fetches, feed)
+        batch_cost,_, _, global_step, lr, summary, predicts, edit_distance, _, min_k, max_k = sess.run(fetches, feed)
         train_writer.add_summary(summary, global_step)
+        if min_k:
+            for k, (i, v, p) in enumerate(zip(*max_k)):
+                print('最大距离差的第 {} 个字符：[{}], 距离差：[{:.05}], prob：[{:.05}]'.format(k, converter.decode_maps[i], v, p))
+            for k, (i, v, p) in enumerate(zip(*min_k)):
+                print('最小距离差的第 {} 个字符：[{}], 距离差：[{:.05}], prob：[{:.05}]'.format(k, converter.decode_maps[i], v, p))
 
         print(batch_cost)
         predicts = [converter.decode(p, CRNN.CTC_INVALID_INDEX) for p in predicts]
@@ -266,11 +259,11 @@ def main():
     # args = parse_args()
     with tf.device(dev):
         trainer = Trainer()
-        trainer.train(log_dir='./output_20200918/log', restore=False, log_step=50, val_step=50, cfg_name='raw',
+        trainer.train(log_dir='./output_20200918/log', restore=True, log_step=5, val_step=50, cfg_name='resnet',
                       ckpt_dir='./output_20200918/checkpoint/default',
-                      chars_file='./data/chars/lexicon.txt', train_txt='./data_example/train_new.txt',
-                      val_txt='./data_example//test_new.txt', test_txt='./data_example//test_new.txt',
-                      result_dir='./output_20200918/result'
+                      chars_file='./data/chars/lexicon.txt', train_txt='./data_example/train.txt',
+                      val_txt='./data_example/test_new.txt', test_txt='./data_example/test_new.txt',
+                      result_dir='./output_20200918/result')
 
 
 if __name__ == '__main__':
