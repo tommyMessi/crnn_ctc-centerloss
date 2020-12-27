@@ -8,18 +8,18 @@
 
 3. 增加对关键指标的计算和追踪，训练过程更直观，方便 debug （需要tf1.15）
 
-  <img src="data/distance_between_centers.png" style="zoom:50%;" />
+  <img src="data/distance_between_centers.png" width = 50% height = 50% />
 
   ​                                                                                    *center 之间的距离*
 
-  <img src="data/distences_to_self_and_brother_center.png" style="zoom:50%;" />
+  <img src="data/distences_to_self_and_brother_center.png" width = 50% height = 50% />
 
   ​      *字符距离自己center、形近字center的距离*
 
-  <img src="data/detail1.png" style="zoom: 50%;" />
+  <img src="data/detail1.png" width = 50% height = 50% />
   ​                                                              
 
-  <img src="data/detail2.png" style="zoom:50%;" />
+  <img src="data/detail2.png" width = 50% height = 50% />
 
   ​     *经过训练，字符距离差增大，预测置信度和距离差拥有一定相关性*
 
@@ -32,21 +32,21 @@
   tensorboard --logdir=your_log_dir
   ```
   
- <img src="data/iter=0.png" style="zoom:50%;" />
+ <img src="data/iter=0.png" width = 50% height = 50% />
 
 
 
  *iter=0*
 
 
- <img src="data/iter=100.png" style="zoom:50%;" />
+ <img src="data/iter=100.png" width = 50% height = 50% />
 
 
 
  *iter=100*
 
 
- <img src="data/iter=500.png" style="zoom:50%;" />
+ <img src="data/iter=500.png" width = 50% height = 50% />
 
 
  *iter=500*
