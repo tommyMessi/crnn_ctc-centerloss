@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6a6fc68c-aca6-480b-801b-08d142d6ccb4" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/ctc_centerloss.iml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -75,7 +79,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="19">
@@ -85,7 +89,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="result.jpeg" pinned="false" current-in-tab="true">
+      <file leaf-file-name="result.jpeg" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data/result.jpeg">
           <provider selected="true" editor-type-id="images">
             <state />
@@ -247,7 +251,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609074710560</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="remove .idea">
+      <created>1609074780540</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1609074780540</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -306,7 +317,8 @@
     <MESSAGE value="solve align problem; add visualization" />
     <MESSAGE value="Revert &quot;modify readme&quot;&#10;&#10;This reverts commit 7313386" />
     <MESSAGE value="modify readme" />
-    <option name="LAST_COMMIT_MESSAGE" value="modify readme" />
+    <MESSAGE value="remove .idea" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove .idea" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -516,17 +528,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data/result.jpeg">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="19">
           <caret line="1" column="17" lean-forward="true" selection-start-line="1" selection-start-column="17" selection-end-line="1" selection-end-column="17" />
           <folding />
         </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/result.jpeg">
-      <provider selected="true" editor-type-id="images">
-        <state />
       </provider>
     </entry>
   </component>
