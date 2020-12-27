@@ -8,20 +8,20 @@
 
 3. 增加对关键指标的计算和追踪，训练过程更直观，方便 debug （需要tf1.15）
 
-  *center 之间的距离：*
-  <img src="data/distance_between_centers.png" width=50% height=50% />
+  <img src="data/distance_between_centers.png" style="zoom:50%;" />
 
-  ​                                                                            
-  *字符距离自己center、形近字center的距离：*
-  <img src="data/distences_to_self_and_brother_center.png" width=50% height=50%/>
+  ​                                                                                    *center 之间的距离*
 
-  ​      
-  *经过训练，字符距离差增大，预测置信度和距离差拥有一定相关性：*
-  <img src="data/detail1.png" width=50% height=50% />
+  <img src="data/distences_to_self_and_brother_center.png" style="zoom:50%;" />
+
+  ​      *字符距离自己center、形近字center的距离*
+
+  <img src="data/detail1.png" style="zoom: 50%;" />
   ​                                                              
-  <img src="data/detail2.png" width=50% height=50% />
 
-  ​     
+  <img src="data/detail2.png" style="zoom:50%;" />
+
+  ​     *经过训练，字符距离差增大，预测置信度和距离差拥有一定相关性*
 
 4. 增加 feature 的可视化，使用 tensorboard 的 embedding projector，方便debug
 
@@ -32,17 +32,26 @@
   tensorboard --logdir=your_log_dir
   ```
   
-  *iter=0：*
- <img src="data/iter=0.png" width=50% height=50% />
-
- *iter=100：*
- <img src="data/iter=100.png" width=50% height=50% />
-
- *iter=500：*
- <img src="data/iter=500.png" width=50% height=50% />
+ <img src="data/iter=0.png" style="zoom:50%;" />
 
 
- 
+
+ *iter=0*
+
+
+ <img src="data/iter=100.png" style="zoom:50%;" />
+
+
+
+ *iter=100*
+
+
+ <img src="data/iter=500.png" style="zoom:50%;" />
+
+
+ *iter=500*
+
+
 ### 本项目用自己想法实现阿里云栖大会中，阿里团队提到的ctc+centerloss来解决相近字的问题 pdf百度网盘链接: https://pan.baidu.com/s/13370jLcBblmqvwfprHPYXw 提取码: mejj 
 
 ## 大概介绍
@@ -71,7 +80,7 @@
 - ```python test.py```
 
 ## 实验效果
-- <img src="data/iter=result.jpeg" width=50% height=50% />
+- ![result](https://github.com/tommyMessi/crnn_ctc-centerloss/blob/master/data/result.jpeg)
 - 左面图为全量数据 可以看到对于全量也有一点提升
 - 右面图为近似字数据 对于形近字提升有15个点。提升明显并且还有增长空间
 
