@@ -16,7 +16,7 @@
 ./data_example/train_img/17.png	管理人手续费
 ./data_example/train_img/18.png	0.00
 ./data_example/train_img/20.png	账户类
-./data_example/train_img/21.png	业务名涨
+./data_example/train_img/21.png	业务名称
 ./data_example/train_img/22.png	260,100.00
 ./data_example/train_img/23.png	002387/工银沪港深股
 ./data_example/train_img/24.png	申购(划款）

@@ -1,5 +1,57 @@
 # crnn_ctc-centerloss
 
+## 2020.12.27更新
+
+1. 使用 最后一层全连接层输入的 feature 作为处理对象，即缩小这一 feature 的类内距离
+
+2. 实现 feature 和 label 的对齐，主要解决了 预测重复、预测漏字 时的对齐问题（需要tf1.15）
+
+3. 增加对关键指标的计算和追踪，训练过程更直观，方便 debug （需要tf1.15）
+
+  <img src="data/distance_between_centers.png" width = 50% height = 50% />
+
+  ​                                                                                    *center 之间的距离*
+
+  <img src="data/distences_to_self_and_brother_center.png" width = 50% height = 50% />
+
+  ​      *字符距离自己center、形近字center的距离*
+
+  <img src="data/detail1.png" width = 50% height = 50% />
+  ​                                                              
+
+  <img src="data/detail2.png" width = 50% height = 50% />
+
+  ​     *经过训练，字符距离差增大，预测置信度和距离差拥有一定相关性*
+
+4. 增加 feature 的可视化，使用 tensorboard 的 embedding projector，方便debug
+
+  ```bash
+  # 生成 embedding 图
+  python -m libs.projector --model=your_model_path --file=your_label_file_path --dir=your_log_dir
+  # 启动 tensorboard
+  tensorboard --logdir=your_log_dir
+  ```
+  
+ <img src="data/iter=0.png" width = 50% height = 50% />
+
+
+
+ *iter=0*
+
+
+ <img src="data/iter=100.png" width = 50% height = 50% />
+
+
+
+ *iter=100*
+
+
+ <img src="data/iter=500.png" width = 50% height = 50% />
+
+
+ *iter=500*
+
+
 ### 本项目用自己想法实现阿里云栖大会中，阿里团队提到的ctc+centerloss来解决相近字的问题 pdf百度网盘链接: https://pan.baidu.com/s/13370jLcBblmqvwfprHPYXw 提取码: mejj 
 
 ## 大概介绍
@@ -10,6 +62,7 @@
 
 ## 预训练模型(Model)
 - 链接: 链接：https://pan.baidu.com/s/12oa1QcjaWiLb7Xsiz7aqbg  提取码：6Dw9 
+
 
 ## 训练(train) 于2020.11.27更新 更简单的版本
 - ~~1 先用https://github.com/Sanster/tf_crnn 的crnn训练~~

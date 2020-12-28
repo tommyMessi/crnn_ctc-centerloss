@@ -60,27 +60,13 @@ def validation(sess, feeds, fetches, dataset: ImgDataset, converter, result_dir,
     total_batch_time = 0
 
     for batch in range(dataset.num_batches):
-        # img_batch, label_batch, batch_labels, batch_img_paths = dataset.get_next_batch(sess)
-        img_batch, label_batch, batch_labels, positions, batch_img_paths = dataset.get_next_batch(sess)
+        img_batch, label_batch, batch_labels, batch_img_paths = dataset.get_next_batch(sess)
         image_batch_shape = img_batch.shape
         w = round_up(image_batch_shape[2] / 4)
         batch_start_time = time.time()
 
-        positions_list = []
-        for position_str in positions:
-            list2 = [6941 for i in range(w)]
-            position_list = str(position_str, encoding = "utf8").split(',')
-            num_list_new = [int(x) for x in position_list]
-            list2[:len(num_list_new)] = num_list_new
-
-            positions_list.append(list2)
-        con_labels_batch = np.array(positions_list)
-        con_labels = con_labels_batch.reshape((-1))
-
-
         feed = {feeds['inputs']: img_batch,
                 feeds['labels']: label_batch,
-                feeds['con_labels']:con_labels,
                 feeds['len_labels']:w,
                 feeds['is_training']: False}
 

@@ -48,7 +48,7 @@ class ImgDataset:
 
         # labels = utils.load_labels(os.path.join(img_dir, 'labels.txt'))
         # img_paths = utils.build_img_paths(img_dir, len(labels))
-        img_paths, labels, positions = utils.load_img_paths_and_labels(self.anno_txt)
+        img_paths, labels = utils.load_img_paths_and_labels(self.anno_txt)
         self.size = len(labels)
 
         # positions_list = []
@@ -56,7 +56,7 @@ class ImgDataset:
         #     position_list = position_str.split(',')
         #     positions_list.append(position_list)
 
-        dataset = self._create_dataset(img_paths, labels, positions)
+        dataset = self._create_dataset(img_paths, labels)
         iterator = tf.data.Iterator.from_structure(dataset.output_types,
                                                    dataset.output_shapes)
         self.next_batch = iterator.get_next()
@@ -66,13 +66,13 @@ class ImgDataset:
 
     def get_next_batch(self, sess):
         """return images and labels of a batch"""
-        img_batch, labels, img_paths, positions = sess.run(self.next_batch)
+        img_batch, labels, img_paths = sess.run(self.next_batch)
         img_paths = [x.decode() for x in img_paths]
         labels = [l.decode() for l in labels]
 
         encoded_label_batch = self.converter.encode_list(labels)
         sparse_label_batch = self._sparse_tuple_from_label(encoded_label_batch)
-        return img_batch, sparse_label_batch, labels, positions, img_paths
+        return img_batch, sparse_label_batch, labels, img_paths
 
     def _sparse_tuple_from_label(self, sequences, default_val=-1, dtype=np.int32):
         """Create a sparse representention of x.
@@ -101,34 +101,37 @@ class ImgDataset:
 
         return indices, values, shape
 
-    def _create_dataset(self, img_paths, labels, positions):
+    def _create_dataset(self, img_paths, labels):
         img_paths = tf.convert_to_tensor(img_paths, dtype=dtypes.string)
         labels = tf.convert_to_tensor(labels, dtype=dtypes.string)
-        positions = tf.convert_to_tensor(positions, dtype=tf.string)
         print('img_paths:',img_paths)
-        d = tf.data.Dataset.from_tensor_slices((img_paths, labels, positions))
+        d = tf.data.Dataset.from_tensor_slices((img_paths, labels))
         if self.shuffle:
             d = d.shuffle(buffer_size=self.size)
 
         d = d.map(self._input_parser,
                   num_parallel_calls=self.num_parallel_calls)
         # d = d.batch(self.batch_size)
-        d = d.padded_batch(self.batch_size, ([None, None, 1], [], [],[]))
+        d = d.padded_batch(self.batch_size, ([None, None, 1], [], []))
         # d = d.repeat(self.num_epochs)
         d = d.prefetch(buffer_size=2)
         return d
 
-    def _input_parser(self, img_path, label, position):
+    def _input_parser(self, img_path, label):
         img_file = tf.read_file(img_path)
 
         img_decoded = tf.image.decode_image(img_file, channels=self.img_channels)
         if self.img_channels == 3:
             img_decoded = tf.image.rgb_to_grayscale(img_decoded)
 
+        if img_decoded.shape[0] != 32:
+            w = int(img_decoded.shape[1] * 32 / img_decoded.shape[0])
+            img_decoded = tf.image.resize(img_decoded, [32, w])
+
         img_decoded = tf.cast(img_decoded, tf.float32)
         img_decoded = (img_decoded - 128.0) / 128.0
 
-        return img_decoded, label, img_path, position
+        return img_decoded, label, img_path
 
     def normalize_img_batch(self):
         pass
