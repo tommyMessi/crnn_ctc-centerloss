@@ -29,7 +29,9 @@ class Infer(object):
         os.environ['CUDA_VISIBLE_DEVICES'] = '2'
         self.cfg = load_config('resnet')
         self.label_converter = LabelConverter(lexicon)
-
+        self.cfg.lr_boundaries = [10000]
+        self.cfg.lr_values = [self.cfg.lr * (self.cfg.lr_decay_rate ** i) for i in
+                              range(len(self.cfg.lr_boundaries) + 1)]
         config = tf.ConfigProto(allow_soft_placement=True)
         config.gpu_options.allow_growth = True
         config.gpu_options.per_process_gpu_memory_fraction = 0.5
